@@ -489,6 +489,15 @@ bool BTypeVisitor::VisitCallExpr(CallExpr *Call) {
               SourceRange(Call->getLocStart(), Call->getLocEnd()), text);
         }
       }
+    } else if (FunctionDecl *F = dyn_cast<FunctionDecl>(Decl)) {
+      if (F->isExternallyVisible() && !F->getBuiltinID()) {
+        auto start_loc = rewriter_.getSourceMgr().getFileLoc(Decl->getLocStart());
+        if (rewriter_.getSourceMgr().getFileID(start_loc)
+            == rewriter_.getSourceMgr().getMainFileID()) {
+          error(Call->getLocStart(), "cannot call non-static helper function");
+          return false;
+        }
+      }
     }
   }
   return true;

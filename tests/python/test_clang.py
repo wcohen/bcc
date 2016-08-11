@@ -338,5 +338,17 @@ int many(struct pt_regs *ctx, int a, int b, int c, int d, int e, int f, int g) {
         with self.assertRaises(Exception):
             b = BPF(text=text)
 
+    def test_invalid_noninline_call(self):
+        text = """
+int bar(void) {
+    return 0;
+}
+int foo(struct pt_regs *ctx) {
+    return bar();
+}
+"""
+        with self.assertRaises(Exception):
+            b = BPF(text=text)
+
 if __name__ == "__main__":
     main()
