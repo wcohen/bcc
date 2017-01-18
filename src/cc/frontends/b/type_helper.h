@@ -19,6 +19,10 @@
 namespace ebpf {
 namespace cc {
 
+#if __SIZEOF_POINTER__ == 8
+#define BITS64
+#endif
+
 // Represent the numeric type of a protocol field
 enum FieldType {
   INVALID = 0,
@@ -36,7 +40,9 @@ static inline size_t enum_to_size(const FieldType t) {
     case UINT16_T: return sizeof(uint16_t);
     case UINT32_T: return sizeof(uint32_t);
     case UINT64_T: return sizeof(uint64_t);
+#ifdef BITS64
     case UINT128_T: return sizeof(__uint128_t);
+#endif
     default:
       return 0;
   }

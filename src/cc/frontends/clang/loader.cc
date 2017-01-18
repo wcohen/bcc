@@ -166,12 +166,16 @@ int ClangLoader::parse(unique_ptr<llvm::Module> *mod, unique_ptr<vector<TableDes
   DiagnosticsEngine diags(DiagID, &*diag_opts, diag_client);
 
   // set up the command line argument wrapper
-#if defined(__powerpc64__)
-  driver::Driver drv("", "ppc64le-unknown-linux-gnu", diags);
+#if defined(__arm__)
+  driver::Driver drv("", "armv7hl-unknown-linux-gnu", diags);
 #elif defined(__aarch64__)
   driver::Driver drv("", "aarch64-unknown-linux-gnu", diags);
-#else
+#elif defined(__powerpc64__)
+  driver::Driver drv("", "ppc64le-unknown-linux-gnu", diags);
+#elif  defined(__x86_64__)
   driver::Driver drv("", "x86_64-unknown-linux-gnu", diags);
+#else
+#error "bcc does not support this platform yet"
 #endif
   drv.setTitle("bcc-clang-driver");
   drv.setCheckInputsExist(false);

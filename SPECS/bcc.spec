@@ -11,7 +11,7 @@ License:        ASL 2.0
 URL:            https://github.com/iovisor/bcc
 Source0:        bcc.tar.gz
 
-ExclusiveArch: x86_64
+ExclusiveArch: %{arm} x86_64
 BuildRequires: bison cmake >= 2.8.7 flex make
 BuildRequires: gcc gcc-c++ python2-devel elfutils-libelf-devel-static
 BuildRequires: luajit luajit-devel
@@ -76,7 +76,7 @@ Requires: python-bcc = %{version}-%{release}
 Command line tools for BPF Compiler Collection (BCC)
 
 %files -n libbcc
-/usr/lib64/*
+%{_libdir}/*
 /usr/include/bcc/*
 
 %files -n python-bcc
@@ -103,6 +103,9 @@ Command line tools for BPF Compiler Collection (BCC)
 %postun -n libbcc -p /sbin/ldconfig
 
 %changelog
+* Tue Jan 10 2017 William Cohen <wcohen@redhat.com> - 0.2.0-2
+- Enable bcc to build on 32-bit arm architectures.
+
 * Mon Nov 21 2016 William Cohen <wcohen@redhat.com> - 0.2.0-1
 - Revise bcc.spec to address rpmlint issues and build properly in Fedora koji.
 

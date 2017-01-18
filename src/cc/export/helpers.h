@@ -31,6 +31,10 @@ R"********(
 #define BPF_MAX_STACK_DEPTH 127
 #endif
 
+#if __SIZEOF_POINTER__ == 8
+#define BITS64
+#endif
+
 /* helper macro to place programs, maps, license in
  * different sections in elf_bpf file. Section names
  * are interpreted by elf_bpf loader
@@ -276,9 +280,11 @@ static inline u64 bpf_ntohll(u64 val) {
   return __builtin_bswap64(val);
 }
 
+#ifdef BITS64
 static inline unsigned __int128 bpf_ntoh128(unsigned __int128 val) {
   return (((unsigned __int128)bpf_ntohll(val) << 64) | (u64)bpf_ntohll(val >> 64));
 }
+#endif
 
 static inline u16 bpf_htons(u16 val) {
   return bpf_ntohs(val);
@@ -290,9 +296,12 @@ static inline u32 bpf_htonl(u32 val) {
 static inline u64 bpf_htonll(u64 val) {
   return bpf_ntohll(val);
 }
+
+#ifdef BITS64
 static inline unsigned __int128 bpf_hton128(unsigned __int128 val) {
   return bpf_ntoh128(val);
 }
+#endif
 
 static inline u64 load_dword(void *skb, u64 off) {
   return ((u64)load_word(skb, off) << 32) | load_word(skb, off + 4);
@@ -323,7 +332,7 @@ static inline unsigned int bpf_log2(unsigned int v)
   return r;
 }
 
-static inline unsigned int bpf_log2l(unsigned long v)
+static inline unsigned int bpf_log2l(unsigned long long v)
 {
   unsigned int hi = v >> 32;
   if (hi)
@@ -458,7 +467,17 @@ struct pt_regs;
 int bpf_usdt_readarg(int argc, struct pt_regs *ctx, void *arg) asm("llvm.bpf.extra");
 int bpf_usdt_readarg_p(int argc, struct pt_regs *ctx, void *buf, u64 len) asm("llvm.bpf.extra");
 
-#ifdef __powerpc__
+#if defined(__arm__)
+#define PT_REGS_PARM1(ctx)	((ctx)->uregs[0])
+#define PT_REGS_PARM2(ctx)	((ctx)->uregs[1])
+#define PT_REGS_PARM3(ctx)	((ctx)->uregs[2])
+#define PT_REGS_PARM4(ctx)	((ctx)->uregs[3])
+#define PT_REGS_PARM5(ctx)	((ctx)->uregs[4]) /* FIXME, not right, on sp */
+#define PT_REGS_PARM6(ctx)	((ctx)->uregs[5]) /* FIXME, not right, on sp */
+#define PT_REGS_RC(ctx)		((ctx)->uregs[0])
+#define PT_REGS_IP(ctx)		((ctx)->uregs[12])
+#define PT_REGS_SP(ctx)		((ctx)->uregs[13])
+#elif defined(__powerpc__)
 #define PT_REGS_PARM1(ctx)	((ctx)->gpr[3])
 #define PT_REGS_PARM2(ctx)	((ctx)->gpr[4])
 #define PT_REGS_PARM3(ctx)	((ctx)->gpr[5])

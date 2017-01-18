@@ -34,20 +34,26 @@
 namespace ebpf {
 
 constexpr int MAX_CALLING_CONV_REGS = 6;
+const char *calling_conv_regs_arm[] = {"uregs[0]", "uregs[1]", "uregs[2]",
+                                       "uregs[3]", "uregs[4]", "uregs[5]"};
+const char *calling_conv_regs_arm64[] = {"regs[0]", "regs[1]", "regs[2]",
+                                       "regs[3]", "regs[4]", "regs[5]"};
+const char *calling_conv_regs_ppc[] = {"gpr[3]", "gpr[4]", "gpr[5]",
+                                       "gpr[6]", "gpr[7]", "gpr[8]"};
 const char *calling_conv_regs_x86[] = {
   "di", "si", "dx", "cx", "r8", "r9"
 };
-const char *calling_conv_regs_ppc[] = {"gpr[3]", "gpr[4]", "gpr[5]",
-                                       "gpr[6]", "gpr[7]", "gpr[8]"};
-const char *calling_conv_regs_arm64[] = {"regs[0]", "regs[1]", "regs[2]",
-                                       "regs[3]", "regs[4]", "regs[5]"};
 // todo: support more archs
-#if defined(__powerpc__)
-const char **calling_conv_regs = calling_conv_regs_ppc;
+#if defined(__arm__)
+const char **calling_conv_regs = calling_conv_regs_arm;
 #elif defined(__aarch64__)
 const char **calling_conv_regs = calling_conv_regs_arm64;
-#else
+#elif defined(__powerpc__)
+const char **calling_conv_regs = calling_conv_regs_ppc;
+#elif defined(__x86_64__)
 const char **calling_conv_regs = calling_conv_regs_x86;
+#else
+#error "bcc does not support this platform yet"
 #endif
 
 using std::map;

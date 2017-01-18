@@ -40,6 +40,8 @@ int KBuildHelper::get_flags(const char *uname_machine, vector<string> *cflags) {
     arch = "x86";
   } else if (!strncmp(uname_machine, "arm", 3)) {
     arch = "arm";
+    cflags->push_back("-mfloat-abi=soft"); /* FIXME ugly hack */
+    cflags->push_back("-D__LINUX_ARM_ARCH__=6"); /* FIXME ugly hack */
   } else if (!strncmp(uname_machine, "sa110", 5)) {
     arch = "arm";
   } else if (!strncmp(uname_machine, "s390x", 5)) {
